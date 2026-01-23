@@ -1,0 +1,112 @@
+import tkinter as tk
+from tkinter import messagebox
+
+CALORIES_PER_MINUTE = 10
+
+# ===== COLORS =====
+BG_COLOR = "#E3F2FD"
+CARD_COLOR = "#FFFFFF"
+PRIMARY = "#2196F3"
+SUCCESS = "#4CAF50"
+WARNING = "#FF9800"
+DANGER = "#F44336"
+TEXT = "#333333"
+
+def calculate():
+    try:
+        name = name_entry.get()
+        running_minutes = float(run_entry.get())
+        calorie_intake = float(food_entry.get())
+
+        if running_minutes < 0 or calorie_intake < 0:
+            messagebox.showerror("Error", "กรุณาใส่ค่าที่มากกว่าหรือเท่ากับ 0")
+            return
+
+        burned = running_minutes * CALORIES_PER_MINUTE
+        net = calorie_intake - burned
+
+        result_text = (
+            f"📊 สรุปผล\n\n"
+            f"👤 ชื่อ: {name}\n"
+            f"⏱️ วิ่ง: {running_minutes:.1f} นาที\n"
+            f"🔥 เผาผลาญ: {burned:.1f} แคลอรี่\n"
+            f"🍔 รับเข้า: {calorie_intake:.1f} แคลอรี่\n"
+            f"⚖️ สุทธิ: {net:.1f} แคลอรี่\n\n"
+        )
+
+        if net > 0:
+            result_text += "📈 วันนี้พลังงานเกินนิดหน่อย"
+            result_label.config(fg=WARNING)
+        elif net < 0:
+            result_text += "📉 เยี่ยมมาก! เผาผลาญได้มากกว่าที่กิน"
+            result_label.config(fg=SUCCESS)
+        else:
+            result_text += "✅ สมดุลพอดีเป๊ะ!"
+            result_label.config(fg=PRIMARY)
+
+        result_label.config(text=result_text)
+
+    except ValueError:
+        messagebox.showerror("Error", "กรุณาใส่ตัวเลขเท่านั้น")
+
+# ===== WINDOW =====
+root = tk.Tk()
+root.title("🏃 Fitness & Calorie Tracker")
+root.geometry("440x520")
+root.configure(bg=BG_COLOR)
+
+# ===== CARD =====
+card = tk.Frame(root, bg=CARD_COLOR)
+card.place(relx=0.5, rely=0.5, anchor="center", width=380, height=470)
+
+# ===== TITLE =====
+tk.Label(
+    card,
+    text="🏃 Fitness & Calorie Tracker",
+    font=("Arial", 16, "bold"),
+    bg=CARD_COLOR,
+    fg=PRIMARY
+).pack(pady=15)
+
+# ===== INPUTS =====
+def label(text):
+    return tk.Label(card, text=text, bg=CARD_COLOR, fg=TEXT, font=("Arial", 11))
+
+label("ชื่อของคุณ").pack(anchor="w", padx=20)
+name_entry = tk.Entry(card, font=("Arial", 11))
+name_entry.pack(fill="x", padx=20, pady=5)
+
+label("ระยะเวลาการวิ่ง (นาที)").pack(anchor="w", padx=20)
+run_entry = tk.Entry(card, font=("Arial", 11))
+run_entry.pack(fill="x", padx=20, pady=5)
+
+label("แคลอรี่ที่ได้รับจากอาหาร").pack(anchor="w", padx=20)
+food_entry = tk.Entry(card, font=("Arial", 11))
+food_entry.pack(fill="x", padx=20, pady=5)
+
+# ===== BUTTON =====
+tk.Button(
+    card,
+    text="คำนวณแคลอรี่",
+    command=calculate,
+    bg=PRIMARY,
+    fg="white",
+    activebackground="#1976D2",
+    font=("Arial", 12, "bold"),
+    bd=0,
+    height=2
+).pack(fill="x", padx=20, pady=15)
+
+# ===== RESULT =====
+result_label = tk.Label(
+    card,
+    text="",
+    bg=CARD_COLOR,
+    fg=TEXT,
+    font=("Arial", 11),
+    justify="left",
+    wraplength=330
+)
+result_label.pack(padx=20, pady=10)
+
+root.mainloop()
